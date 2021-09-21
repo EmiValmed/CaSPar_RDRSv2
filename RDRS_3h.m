@@ -13,21 +13,21 @@ clear; close all; clc
 %% Declarations
 
 % Directories
-dataPath = 'Path\of\the\RDRS\data'  ; addpath(dataPath);  # To Modify
-shpPath  = 'Shapefile\path'         ; addpath(shpPath);   # To Modify
-OutPath = 'Output\path'             ; addpath(OutPath);   # To Modify
+dataPath = 'Path\of\the\RDRS\data'  ; addpath(dataPath);  % To Modify
+shpPath  = 'Shapefile\path'         ; addpath(shpPath);   % To Modify
+OutPath = 'Output\path'             ;                     % To Modify
 
 if ~exist(fullfile(OutPath), 'dir')
     mkdir(fullfile(OutPath));         addpath(OutPath);
 end
 
 % Catchments name
-nameC = {'name 1';'name 2';'name 3';... 'name n'};    # To Modify
+nameC = {'name 1';'name 2';'name 3'; '...name n'};    % To Modify
 nBV   = numel(nameC);
 
 % Period of the time series (.nc files)
-dateStart = 'YYYY/MM/DD 12:00:00';  # To Modify
-dateEnd   = 'YYYY/MM/DD 12:00:00';  # To Modify
+dateStart = 'YYYY/MM/DD 12:00:00';  % To Modify
+dateEnd   = 'YYYY/MM/DD 12:00:00';  % To Modify
 dateRef   = datenum(dateStart):1:datenum(dateEnd);
 nDays     = numel(dateRef);
 
