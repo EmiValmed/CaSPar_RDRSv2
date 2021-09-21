@@ -13,22 +13,21 @@ clear; close all; clc
 %% Declarations
 
 % Directories
-dataPath = 'Path\of\the\RDRS\data' ; addpath(dataPath);
-shpPath  = 'Shapefile\path'         ; addpath(shpPath);
+dataPath = 'Path\of\the\RDRS\data'  ; addpath(dataPath);  # To Modify
+shpPath  = 'Shapefile\path'         ; addpath(shpPath);   # To Modify
+OutPath = 'Output\path'             ; addpath(OutPath);   # To Modify
 
 if ~exist(fullfile(OutPath), 'dir')
-    mkdir(fullfile(OutPath));
+    mkdir(fullfile(OutPath));         addpath(OutPath);
 end
 
-OutPath = 'Output\path'          ; addpath(OutPath);
-
 % Catchments name
-nameC = {'name 1';'name 2';'name 3';... 'name n'};
+nameC = {'name 1';'name 2';'name 3';... 'name n'};    # To Modify
 nBV   = numel(nameC);
 
 % Period of the time series (.nc files)
-dateStart = '2000/01/01 12:00:00';
-dateEnd   = '2017/12/31 12:00:00';
+dateStart = 'YYYY/MM/DD 12:00:00';  # To Modify
+dateEnd   = 'YYYY/MM/DD 12:00:00';  # To Modify
 dateRef   = datenum(dateStart):1:datenum(dateEnd);
 nDays     = numel(dateRef);
 
@@ -148,29 +147,27 @@ end
 % Define output file name
 % ---------------------------------------------------------------------------------------------------------------------------
 
-outfile = sprintf('%s/RDRS_3hr.mat',resultPath);
+outfile = sprintf('%s/RDRS_3hr.mat',OutPath);
 % Export
 save(outfile,'PttmpCatch', 'TtmpCatch', 'TminCatch','TmaxCatch','Datehr', '-v6');
 
 % ---------------------------------------------------------------------------------------------------------------------------
 % Save output - catchment-wise
 % ---------------------------------------------------------------------------------------------------------------------------
+
+% Date
+dateRef = transpose(reshape(Datehr,1,[]));
+dateRef = dateRef(3:3:end);
+Date    = datevec(dateRef);
+
 for iCatch=1:nBV
-    
-    % Define output file name
-    load(sprintf('%s/RDRS_3hr.mat',resultPath));
     
     % Extract catchment values
     Pt    = transpose(reshape(PttmpCatch(:,:,iCatch),1,[]));
     T     = transpose(reshape(TtmpCatch(:,:,iCatch),1,[]));
     Tmax  = transpose(reshape(TmaxCatch(:,:,iCatch),1,[]));
     Tmin  = transpose(reshape(TminCatch(:,:,iCatch),1,[]));
-    
-    % Date
-    dateRef = transpose(reshape(Datehr,1,[]));
-    dateRef = dateRef(3:3:end);
-    Date    = datevec(dateRef);
-  
+      
     % Export
     outfile = sprintf('%s/RDRS_3h_%s.mat',OutPath,nameC{iCatch});
     save(outfile,'Pt','T','Tmin','Tmax','Date','-v7.3');
