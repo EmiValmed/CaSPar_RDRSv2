@@ -26,8 +26,8 @@ nameC = {'name 1';'name 2';'name 3'; '...name n'};    % To Modify
 nBV   = numel(nameC);
 
 % Period of the time series (.nc files)
-dateStart = 'YYYY/MM/DD 12:00:00';  % To Modify
-dateEnd   = 'YYYY/MM/DD 12:00:00';  % To Modify
+dateStart = 'YYYY-MM-DD 12:00:00';  % To Modify
+dateEnd   = 'YYYY-MM-DD 12:00:00';  % To Modify
 dateRef   = datenum(dateStart):1:datenum(dateEnd);
 nDays     = numel(dateRef);
 
@@ -109,7 +109,7 @@ for iDate = 1:nDays
     
     % time
     date = netcdf.getVar(ncid,netcdf.inqVarID(ncid,'time'),'single');
-    Datehr(:,iDate) = double(date)./nhr + datenum('2000-01-01 12:00:00') + iDate;
+    Datehr(:,iDate) = double(date)./nhr + datenum(dateStart) + iDate;
     
     % Close NetCDF file
     netcdf.close(ncid);
