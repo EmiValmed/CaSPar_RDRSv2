@@ -1,34 +1,41 @@
-clear; close all; clc
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Name         : RDRS_3h 
+% Author       : Emixi Valdez (emixi-sthefany.valdez-medina.1@ulaval.ca) 
+% Date         : Tue Sep 21 15:17:00 2021
+% Description  : This code converts the Regional Deterministic Reforecast System (RDRS_v2; hourly dataset) netCDF files to 
+%                Matlab format and temporally aggregates them to a 3h time step, and spatially averages them to the catchment 
+%                scale.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear; close all; clc
 %%                                            THE ONLY PART TO MODIFY 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Declarations
 
 % Directories
-dataPath='Path\of\the\RDRS\data' ; addpath(dataPath);
-shpPath='Shapefile\path'         ; addpath(shpPath);
+dataPath = 'Path\of\the\RDRS\data' ; addpath(dataPath);
+shpPath  = 'Shapefile\path'         ; addpath(shpPath);
+
+if ~exist(fullfile(OutPath), 'dir')
+    mkdir(fullfile(OutPath));
+end
+
 OutPath = 'Output\path'          ; addpath(OutPath);
 
-if ~exist(fullfile(dataPath, 'MatlabFormat'), 'dir')
-    mkdir(fullfile(dataPath, 'MatlabFormat'));
-end
-resultPath =  fullfile(dataPath, 'MatlabFormat'); addpath(resultPath);
-
 % Catchments name
-nameC = {'023402';'023422';'023429'};
-nBV = numel(nameC);
+nameC = {'name 1';'name 2';'name 3';... 'name n'};
+nBV   = numel(nameC);
 
-% Period of teh time series
+% Period of the time series (.nc files)
 dateStart = '2000/01/01 12:00:00';
 dateEnd   = '2017/12/31 12:00:00';
 dateRef   = datenum(dateStart):1:datenum(dateEnd);
-nDays = numel(dateRef);
+nDays     = numel(dateRef);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                            DO NOT TOUCH FROM HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Step 1: Create catchments mask
+%% Step 1: CREATE CATCHMENT MASK
 
 % Import NetCDF coordinates
 fileToRead=fullfile(dataPath,strcat(datestr(dateRef(1),'yyyymmddHH'),'.nc'));
@@ -36,16 +43,17 @@ ncid = netcdf.open(fileToRead,'NC_NOWRITE');
 lat0 = netcdf.getVar(ncid,netcdf.inqVarID(ncid,'lat'),'single');
 lon0 = netcdf.getVar(ncid,netcdf.inqVarID(ncid,'lon'),'single');
 
-% Conversion of Lat and Lon
+% Conversion of Lat and Lon to match with the .shp format
 lon0b = lon0';
 lat0b = lat0';
 
+% close netCDF file
 netcdf.close(ncid);
 
 % Build catchment masks
 for iCatch = 1:nBV
     % Import ctch shape
-    [S]=shaperead(fullfile(shpPath,nameC{iCatch},sprintf('%s.shp',nameC{iCatch})));
+    [S]=shaperead(fullfile(shpPath,sprintf('%s.shp',nameC{iCatch})));
     % Get points inside the catchment
     inGrid_tmp = inpolygon(lon0b,lat0b,S.X,S.Y);
     % Transpose mask for NetCDF compatibility (y,x,T)
@@ -61,11 +69,10 @@ end
 clear ncid S lat0  lon0  inGrid_tmp
 
 %% Index to accumulate get the variables at 3h time step
-
-n= 24;
-index = 1:n;
-elem = [repmat(3,1,floor(n/3))];
-endv = n-sum(elem);
+nhr= 24; % time dimension: 24 hr 
+index = 1:nhr;
+elem  = [repmat(3,1,floor(nhr/3))];
+endv  = nhr-sum(elem);
 if(~endv)
     endv = [];
 end
@@ -73,12 +80,14 @@ index = mat2cell(index,1,[elem,endv])';
 
 %% Initialization
 PttmpCatch = NaN(8,nDays,nBV);
-TtmpCatch = NaN(8,nDays,nBV);
-TminCatch = NaN(8,nDays,nBV);
-TmaxCatch = NaN(8,nDays,nBV);
-Datehr = NaN(24,nDays);
+TtmpCatch  = NaN(8,nDays,nBV);
+TminCatch  = NaN(8,nDays,nBV);
+TmaxCatch  = NaN(8,nDays,nBV);
+Datehr     = NaN(nhr,nDays);
 
+% ---------------------------------------------------------------------------------------------------------------------------   
 %% Step 2: Retrieve NetCDF data
+% ---------------------------------------------------------------------------------------------------------------------------  
 for iDate = 1:nDays
     
     % Display process
@@ -88,8 +97,8 @@ for iDate = 1:nDays
     end
     
     % Open NetCDF file   
-    fileToRead=fullfile(dataPath,strcat(datestr(dateRef(iDate),'yyyymmddHH'),'.nc'));
-    ncid = netcdf.open(fileToRead,'NC_NOWRITE');
+    fileToRead = fullfile(dataPath,strcat(datestr(dateRef(iDate),'yyyymmddHH'),'.nc'));
+    ncid       = netcdf.open(fileToRead,'NC_NOWRITE');
     
     % Retrieve RDRS variables
     % Precipitation
@@ -101,63 +110,72 @@ for iDate = 1:nDays
     
     % time
     date = netcdf.getVar(ncid,netcdf.inqVarID(ncid,'time'),'single');
-    Datehr(:,iDate) = double(date)./24 + datenum('2000-01-01 12:00:00') + iDate;
+    Datehr(:,iDate) = double(date)./nhr + datenum('2000-01-01 12:00:00') + iDate;
     
     % Close NetCDF file
     netcdf.close(ncid);
     
     % Trick for computing cathcment mean at catchment scale
-    Ptmp00 = arrayfun(@(ihr) squeeze(dataP(:,:,ihr)),1:24,'UniformOutput',0);
-    Tmp00 = arrayfun(@(ihr) squeeze(dataT(:,:,ihr)),1:24,'UniformOutput',0);
+    Ptmp00 = arrayfun(@(ihr) squeeze(dataP(:,:,ihr)),1:nhr,'UniformOutput',0);
+    Tmp00  = arrayfun(@(ihr) squeeze(dataT(:,:,ihr)),1:nhr,'UniformOutput',0);
     
     
-    
+    % -----------------------------------------------------------------------------------------------------------------------
     %% Step 3: Compute mean at the catchment scale - Catchment loop
-    
+    % -----------------------------------------------------------------------------------------------------------------------
+   
     for iCatch = 1:nBV
         
         % Retrieve catchment mask
         inan = isnan(inGrid.(sprintf('C%s',nameC{iCatch})));
         
-        Ptmp = arrayfun(@(ihr) mean(Ptmp00{ihr}(~inan)),1:24);
-        Tmp = arrayfun(@(ihr) mean(Tmp00{ihr}(~inan)),1:24);
+        Ptmp = arrayfun(@(ihr) mean(Ptmp00{ihr}(~inan)),1:nhr);
+        Tmp  = arrayfun(@(ihr) mean(Tmp00{ihr}(~inan)),1:nhr);
         
-        Ptmp= transpose(Ptmp);
+        Ptmp = transpose(Ptmp);
         Ttmp = transpose(Tmp);
              
         PttmpCatch(:,iDate,iCatch) = cell2mat(cellfun(@(x) sum(Ptmp(x)),index,'un',0));
-        TtmpCatch(:,iDate,iCatch) = cell2mat(cellfun(@(x) mean(Ttmp(x)),index,'un',0));
-        TminCatch(:,iDate,iCatch) = cell2mat(cellfun(@(x) min(Ttmp(x)),index,'un',0));
-        TmaxCatch(:,iDate,iCatch) = cell2mat(cellfun(@(x) max(Ttmp(x)),index,'un',0));
+        TtmpCatch(:,iDate,iCatch)  = cell2mat(cellfun(@(x) mean(Ttmp(x)),index,'un',0));
+        TminCatch(:,iDate,iCatch)  = cell2mat(cellfun(@(x) min(Ttmp(x)),index,'un',0));
+        TmaxCatch(:,iDate,iCatch)  = cell2mat(cellfun(@(x) max(Ttmp(x)),index,'un',0));
     end
     
     
 end
 
+% ---------------------------------------------------------------------------------------------------------------------------
 % Define output file name
+% ---------------------------------------------------------------------------------------------------------------------------
+
 outfile = sprintf('%s/RDRS_3hr.mat',resultPath);
 % Export
 save(outfile,'PttmpCatch', 'TtmpCatch', 'TminCatch','TmaxCatch','Datehr', '-v6');
 
-
-%% Save output - catchment-wise
-
+% ---------------------------------------------------------------------------------------------------------------------------
+% Save output - catchment-wise
+% ---------------------------------------------------------------------------------------------------------------------------
 for iCatch=1:nBV
     
     % Define output file name
     load(sprintf('%s/RDRS_3hr.mat',resultPath));
     
     % Extract catchment values
-    Pt = transpose(reshape(PttmpCatch(:,:,iCatch),1,[]));
-    T = transpose(reshape(TtmpCatch(:,:,iCatch),1,[]));
-    Tmax = transpose(reshape(TmaxCatch(:,:,iCatch),1,[]));
-    Tmin = transpose(reshape(TminCatch(:,:,iCatch),1,[]));
+    Pt    = transpose(reshape(PttmpCatch(:,:,iCatch),1,[]));
+    T     = transpose(reshape(TtmpCatch(:,:,iCatch),1,[]));
+    Tmax  = transpose(reshape(TmaxCatch(:,:,iCatch),1,[]));
+    Tmin  = transpose(reshape(TminCatch(:,:,iCatch),1,[]));
+    
+    % Date
     dateRef = transpose(reshape(Datehr,1,[]));
     dateRef = dateRef(3:3:end);
-    Date = datevec(dateRef);
+    Date    = datevec(dateRef);
   
     % Export
     outfile = sprintf('%s/RDRS_3h_%s.mat',OutPath,nameC{iCatch});
     save(outfile,'Pt','T','Tmin','Tmax','Date','-v7.3');
     
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                            END :)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
