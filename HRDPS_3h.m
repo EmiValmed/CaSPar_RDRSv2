@@ -13,16 +13,16 @@ clear; close all; clc
 %% Declarations
 
 % Directories
-Dir.dataPath = '\netCDF\files\Path'                                        ; addpath(Dir.dataPath);  % To Modify
-Dir.shpPath  = '\Shapefiles\Path'                                          ; addpath(Dir.shpPath);   % To Modify
-OutPath = '\output\directory\Patha'; % To Modify
+Dir.dataPath = '\netCDF\files\Path'              ; addpath(Dir.dataPath);  % To Modify
+Dir.shpPath  = '\Shapefiles\Path'                ; addpath(Dir.shpPath);   % To Modify
+OutPath = '\output\directory\Patha';                                       % To Modify
 
 if ~exist(fullfile(OutPath), 'dir')
     mkdir(fullfile(OutPath));         addpath(OutPath);
 end
 
 % Catchments name
-nameC =  {'023402';'023422';'023429'};   % To Modify
+nameC =  {'Catch1';'Catch2';'...CatchN'};   % To Modify
 nBV   = numel(nameC);
 
 % Forecasts setting
@@ -32,22 +32,15 @@ ts   = 3;  % time step
 % Getting the netCDF files name
 cd(Dir.dataPath)
 ncFiles  = dir('*.nc');
-nDays    = size(ncFiles,1);
-dateRef  = NaN(nDays,1);
 
-for ifile = 1: nDays
-    nameFile(ifile) = convertCharsToStrings(ncFiles(ifile).name);
-    tmp =  split(nameFile(ifile), ".nc");
-    dateRef(ifile,1) = datenum(datetime(tmp(1),'InputFormat','yyyymmddHH','Format', 'yyyy-MM-dd HH'));
+for ifile = 1: size(ncFiles,1)
+     tmp = split(convertCharsToStrings(ncFiles(ifile).name), ".nc");
+     nameFile(ifile) = tmp(1)   
 end
-dateRef = datevec(dateRef);
-dateRef(:,5) = 0;
-dateRef = datenum(dateRef);
 
-% Select files from 2019
-dateRef  = dateRef(577:end);
+nameFile = unique(nameFile);
+dateRef = datenum(nameFile,'yyyymmddHH');
 nDays    = numel(dateRef);
-nameFile = nameFile(577:end);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                            DO NOT TOUCH FROM HERE
@@ -70,7 +63,7 @@ netcdf.close(ncid);
 % Build catchment masks
 for iCatch = 1:nBV
     % Import ctch shape
-    [S]=shaperead(fullfile(Dir.shpPath,nameC{iCatch},sprintf('%s.shp',nameC{iCatch})));
+    [S]=shaperead(fullfile(Dir.shpPath,sprintf('%s.shp',nameC{iCatch})));
     % Get points inside the catchment
     inGrid_tmp = inpolygon(lon0b,lat0b,S.X,S.Y);
     % Transpose mask for NetCDF compatibility (y,x,T)
@@ -171,29 +164,6 @@ for iDate = 1:nDays
     
 end
 
-% ---------------------------------------------------------------------------------------------------------------------------
-% Save output - catchment-wise - HOOPLA
-% ---------------------------------------------------------------------------------------------------------------------------
-
-% Date
-Date_LeadTimes = Datehr;
-Date = datevec(dateRef);
-leadTime = (1:48)./8;
-
-for iCatch=1:nBV
-    
-    % Extract catchment values
-    Pt = PttmpCatch(:,:,iCatch);
-    T = TtmpCatch(:,:,iCatch);
-    Tmax = TmaxCatch(:,:,iCatch);
-    Tmin = TminCatch(:,:,iCatch);
-    
-   
-    % Export
-    outfile = sprintf('%s/Met_fcast_%s.mat',OutPath,nameC{iCatch});
-    save(outfile,'leadTime','Pt','T','Tmin','Tmax','Date','Date_LeadTimes','-v7.3');
-    
-end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                            END :)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
