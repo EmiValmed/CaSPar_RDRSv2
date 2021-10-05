@@ -10,13 +10,12 @@ This code converts the precipitation and temperature variables from the Regional
 |RDRS_v2_P_TT_1.5m | Air temperature | [°C]	|1.5m|
 
 ## Information required to use the code
-The following information must be specified in the code block that comprises lines 12-31 (identified as "THE ONLY PART TO MODIFY")
-Catchments' name (nameC).  
-Time step (TS)
-netCDF files path (dataPath)
-Shapefiles path (shpPath). Shapefiles must have the name of the catchment: name1.shp, name2.shp,...nameN.shp 
-Output (OutPath)
+The following information must be specified in the block comprised by the lines 9-31 (identified as "THE ONLY PART TO MODIFY") :point_down:
+
 ```
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear; close all; clc
+%%                                            THE ONLY PART TO MODIFY 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Declarations
 
@@ -37,12 +36,19 @@ nBV   = numel(nameC);
 TS = 3; % time step in hr % To Modify
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 ```
+* Catchments' name (nameC).  
+* Time step (TS)
+* netCDF files path (dataPath)
+* Shapefiles path (shpPath). Shapefiles must have the name of the catchment (e.g., name1.shp, name2.shp,...nameN.shp) 
+Output (OutPath)
+
 
 For more information on the available products visit the [CaSPar](https://github.com/julemai/CaSPAr/wiki/Available-products) website.
 
-
+## Contact
+Please, feel free to contact me if you find any bugs or have any questions. :smiley:
+    :e-mail:: emixi-sthefany.valdez-medina.1@ulaval.ca 
 
 
 
