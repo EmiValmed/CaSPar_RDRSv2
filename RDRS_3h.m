@@ -22,7 +22,7 @@ if ~exist(fullfile(OutPath), 'dir')
 end
 
 % Catchments name
-nameC = {'name 1';'name 2';'name 3'; '...name n'};    % To Modify
+nameC = {'name1';'name2';'name3'; '...nameN'};    % To Modify
 nBV   = numel(nameC);
 
 % Defining time step
