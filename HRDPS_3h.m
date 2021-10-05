@@ -2,9 +2,9 @@
 % Name         : HRDPS_3h
 % Author       : Emixi Valdez (emixi-sthefany.valdez-medina.1@ulaval.ca)
 % Date         : Tue Sep 21 15:17:00 2021
-% Description  : This code converts the High-Resolution Deterministic Prediction System (HRDPS) netCDF files to
-%                Matlab format and temporally aggregates them to a 3h time step, and spatially averages them to the catchment
-%                scale.
+% Description  : This code converts the High-Resolution Deterministic Prediction System (HRDPS) temperature and precipitation 
+%                into Matlab variables and temporally aggregates them to a 3h time step, and spatially averages them to the 
+%                catchment scale.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; close all; clc
