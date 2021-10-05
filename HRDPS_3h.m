@@ -13,9 +13,9 @@ clear; close all; clc
 %% Declarations
 
 % Directories
-Dir.dataPath = 'G:\THESE\PROJECT_PHD\Reanalys_Test\HRDPS'                               ; addpath(Dir.dataPath);  % To Modify
-Dir.shpPath  = 'G:\THESE\GIS_COUNTRIES\QUEBEC'                                          ; addpath(Dir.shpPath);   % To Modify
-OutPath = 'G:\THESE\PROJECT_PHD\Reanalys_Test\HOOPLA\HOOPLA-master\Data\3h\Det_HRDPS_met_fcast';% To Modify
+Dir.dataPath = '\netCDF\files\Path'                                        ; addpath(Dir.dataPath);  % To Modify
+Dir.shpPath  = '\Shapefiles\Path'                                          ; addpath(Dir.shpPath);   % To Modify
+OutPath = '\output\directory\Patha'; % To Modify
 
 if ~exist(fullfile(OutPath), 'dir')
     mkdir(fullfile(OutPath));         addpath(OutPath);
