@@ -40,7 +40,7 @@ TS = 3; % time step in hr % To Modify
 * Catchments' name (**nameC**).  
 * Time step (**TS**)
 * netCDF files path (**dataPath**)
-* Shapefiles path (**shpPath**). Shapefiles must have the name of the catchment (e.g., name1.shp, name2.shp,...nameN.shp) 
+* Shapefiles path (**shpPath**). Shapefiles must have the name of the catchment (e.g., *name1.shp, name2.shp,...nameN.shp*) 
 * Output (**OutPath**)
 
 > You can modify the code to work with other variables :smiley:.
