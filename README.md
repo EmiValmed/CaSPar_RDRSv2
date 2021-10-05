@@ -44,7 +44,7 @@ TS = 3; % time step in hr % To Modify
 * Output (**OutPath**)
 
 > You can modify the code to work with other variables :smiley:.
-> For more information on the available products visit the [CaSPar](https://github.com/julemai/CaSPAr/wiki/Available-products) website.
+> For more information on the available products, visit the [CaSPar](https://github.com/julemai/CaSPAr/wiki/Available-products) website.
 
 ## Contact
 Please, feel free to contact me if you find any bugs or have any questions. :smiley:
