@@ -37,19 +37,15 @@ TS = 3; % time step in hr % To Modify
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ```
-* Catchments' name (nameC).  
-* Time step (TS)
-* netCDF files path (dataPath)
-* Shapefiles path (shpPath). Shapefiles must have the name of the catchment (e.g., name1.shp, name2.shp,...nameN.shp) 
-Output (OutPath)
+* Catchments' name (**nameC**).  
+* Time step (**TS**)
+* netCDF files path (**dataPath**)
+* Shapefiles path (**shpPath**). Shapefiles must have the name of the catchment (e.g., name1.shp, name2.shp,...nameN.shp) 
+* Output (**OutPath**)
 
-
-For more information on the available products visit the [CaSPar](https://github.com/julemai/CaSPAr/wiki/Available-products) website.
+> You can modify the code to work with other variables :smiley:.
+> For more information on the available products visit the [CaSPar](https://github.com/julemai/CaSPAr/wiki/Available-products) website.
 
 ## Contact
 Please, feel free to contact me if you find any bugs or have any questions. :smiley:
-    :e-mail:: emixi-sthefany.valdez-medina.1@ulaval.ca 
-
-
-
-
+:e-mail:: emixi-sthefany.valdez-medina.1@ulaval.ca 
