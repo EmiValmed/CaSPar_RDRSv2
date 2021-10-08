@@ -121,7 +121,7 @@ for iDate = 1:nDays
     
     % time
     date = netcdf.getVar(ncid,netcdf.inqVarID(ncid,'time'),'single');
-    Datehr(:,iDate) = double(date)./nhr + datenum(dateStart) + iDate;
+    Datehr(:,iDate) = double(date)./nhr + dateRef(iDate);
     
     % Close NetCDF file
     netcdf.close(ncid);
